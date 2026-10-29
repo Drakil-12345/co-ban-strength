@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#181c2b" />
+  <meta name="description" content="CƠ BẢN - lộ trình 4 tuần giúp người mới tự tin tập cơ." />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>CƠ BẢN · Từ đã lưu đến đã tập</title>
+</head>
+<body>
+  <div class="app-frame">
+    <aside class="sidebar" aria-label="Điều hướng chính">
+      <a class="brand" href="#home" data-route="home" aria-label="CƠ BẢN - Trang chủ"><span class="brand-mark">CƠ</span><span><strong>CƠ BẢN</strong><small>Tự tin tự tập</small></span></a>
+      <nav class="nav-list" id="main-nav">
+        <button class="nav-item active" data-route="home"><span>✦</span>Tổng quan</button>
+        <button class="nav-item" data-route="roadmap"><span>▦</span>Lộ trình</button>
+        <button class="nav-item" data-route="plan"><span>↗</span>Kế hoạch tập</button>
+        <button class="nav-item" data-route="achievements"><span>◇</span>Thành tựu</button>
+        <button class="nav-item" data-route="settings"><span>⚙</span>Dữ liệu</button>
+      </nav>
+      <div class="sidebar-foot"><p><span class="status-dot"></span>Dữ liệu chỉ lưu trên thiết bị này.</p><button class="link-button" data-action="reset">Xóa dữ liệu</button></div>
+    </aside>
+    <main class="main-content">
+      <header class="topbar"><div><p class="eyebrow" id="top-eyebrow">CƠ BẢN · 4 TUẦN</p><h1 id="page-title">Từ đã lưu đến đã tập.</h1></div><div class="top-actions"><button class="icon-button" data-route="settings" aria-label="Mở dữ liệu">⚙</button><button class="mobile-menu" id="mobile-menu" aria-label="Mở menu">☰</button></div></header>
+      <div id="app-root"></div>
+    </main>
+  </div>
+  <nav class="mobile-nav" id="mobile-nav" aria-label="Điều hướng trên điện thoại"><button class="active" data-route="home"><span>✦</span>Trang chủ</button><button data-route="roadmap"><span>▦</span>Lộ trình</button><button class="mobile-primary" data-route="plan"><span>＋</span>Kế hoạch</button><button data-route="achievements"><span>◇</span>Thành tựu</button><button data-route="settings"><span>⚙</span>Dữ liệu</button></nav>
+  <dialog id="lesson-dialog" class="modal"><div id="lesson-modal-content"></div></dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="logic.js"></script><script src="app.js"></script>
+</body>
+</html>
+
