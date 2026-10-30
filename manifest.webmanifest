@@ -4,8 +4,8 @@
   "description": "Lộ trình 4 tuần giúp người mới tự tin tập cơ.",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#f7f4ed",
-  "theme_color": "#181c2b",
+  "background_color": "#1f2937",
+  "theme_color": "#f97316",
   "lang": "vi",
   "icons": [
     {
