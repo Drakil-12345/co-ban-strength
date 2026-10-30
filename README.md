@@ -12,13 +12,28 @@ Mở http://localhost:4173. Chạy qua HTTP để service worker hoạt động.
 
 Không cần framework hoặc build step. Các file chính:
 
-- index.html: khung app và điều hướng.
+- index.html: khung app, điều hướng desktop/mobile, skip link và hai dialog (bài học + giáo án).
 - styles.css: design system CƠ BẢN, responsive desktop/mobile.
+- winner.css: tinh chỉnh tham chiếu Winner (palette đỏ–đen–trắng, hero ảnh, mobile nav).
+- ux.css: lớp tinh chỉnh UX 2026 (dashboard dẫn đường, ticker lộ trình, giáo án, checklist kế hoạch).
 - logic.js: dữ liệu 8 bài và logic thuần cho quiz, tiến độ, kế hoạch, ICS, export/import.
-- app.js: render màn hình, tương tác và lưu localStorage.
+- app.js: render màn hình, engine nextStep (biết việc cần làm tiếp theo), tương tác và lưu localStorage.
+- service-worker.js: cache offline v6; dùng chiến lược network-first để bản mới luôn được nhận.
 - logic.test.js: unit test bằng Node test runner.
 
 Chạy test: node --test logic.test.js
+
+## Trải nghiệm khi vào web
+
+Mỗi thời điểm giao diện chỉ còn một hành động chính được đánh dấu "Đang ở đây":
+
+1. Onboarding 5 bước có link "Để sau, học bài 1" — lên lịch học bài 1 ngay nếu user bỏ qua.
+2. Học 8 bài (mỗi bài 5 phút, quiz 60 điểm để qua).
+3. Chốt 2 ngày tập: checklist 3 mục, prefill từ hồ sơ, nút lưu sáng khi đủ thông tin.
+4. Mở giáo án 30 phút (dialog, dùng được cho Nhà/Gym) + tải .ics nhắc lịch.
+5. Hết luồng → nhắc giữ nhịp 2 buổi/tuần + xem thành tựu.
+
+Điều hướng: `Trang chủ / Bài học / Kế hoạch / Tiến độ / Cài đặt`; trên mobile nút đỏ giữa "Học" luôn dẫn tới việc tiếp theo. URL hỗ trợ `#home / #roadmap / #plan / #achievements / #settings / #onboarding` cho deep link + refresh không mất trang.
 
 ## Thêm hoặc sửa bài học
 
@@ -28,7 +43,7 @@ Bài được mở tuần tự. Quiz đạt từ 60 điểm sẽ hoàn thành b�
 
 ## State và dữ liệu
 
-State được lưu ở localStorage với key co-ban-strength-v1. Dữ liệu không gửi lên máy chủ. Màn hình Dữ liệu cho phép tải JSON, nhập JSON và xóa toàn bộ tiến độ. Khi thay đổi schema, tăng version và cập nhật normalizeState trong logic.js.
+State được lưu ở localStorage với key co-ban-strength-v1 (kèm cờ profile.setupDeferred khi user bấm "Để sau"). Dữ liệu không gửi lên máy chủ. Màn hình Cài đặt cho phép tải JSON, nhập JSON và xóa toàn bộ tiến độ. Khi thay đổi schema, tăng version và cập nhật normalizeState trong logic.js.
 
 ## Thiết kế
 
@@ -38,7 +53,7 @@ Design system được lưu tại design-system/co-ban-strength/MASTER.md. Khi �
 
 ### Bản tinh chỉnh theo mẫu Winner
 
-`winner.css` tải sau `styles.css`, quản lý bảng màu đỏ–đen–trắng, hero, dải biểu tượng và responsive. Khách mới vào trang chủ trước; nút bắt đầu dẫn vào onboarding. Ảnh hero hiện lưu tại `assets/hero-training.jpg`, có cache offline, thay cho ảnh hero remote ở bản trước. Không dùng ảnh AI.
+`winner.css` tải sau `styles.css`, quản lý bảng màu đỏ–đen–trắng, hero, dải biểu tượng và responsive. `ux.css` tải sau cùng cho các tinh chỉnh trải nghiệm (dashboard, ticker, giáo án). Ảnh hero hiện lưu tại `assets/hero-training.jpg`, có cache offline, thay cho ảnh hero remote ở bản trước. Không dùng ảnh AI.
 
 Nguồn ảnh: [Andres Ayrton / Pexels — A Man and a Woman Training at the Gym](https://www.pexels.com/photo/a-man-and-a-woman-training-at-the-gym-6550840/).
 

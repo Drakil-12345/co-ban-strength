@@ -9,6 +9,9 @@
 - Small 2px radii, visible focus, 44px touch targets, 16px mobile form inputs. Respect reduced motion.
 - Hero photography: real Pexels photo 6550840 by Andres Ayrton, saved locally and cached offline. No AI-generated images.
 - First visit opens the landing page; starting a lesson enters existing onboarding. Preserve storage and progress schema.
+- `ux.css` (loaded after winner.css) implements the 2026 guided-UX update: dynamic hero CTA + progress ring, three-step journey cards with "Đang ở đây" marker, roadmap ticker (keeps the user's marquee, moved out of the main heading), plan checklist with prefill, onboarding with a visible "Để sau, học bài 1" exit, workout-guide dialog and native dialog animations.
+- Navigation labels: Trang chủ / Bài học / Kế hoạch / Tiến độ / Cài đặt. Mobile keeps a raised red "Học" center button plus two topbar icons (plan + settings) so the plan stays reachable.
+- Service worker cache prefix was bumped with `ux.css` and uses network-first to avoid stale assets. Keep cache name in sync with future asset changes.
 
 The orange/green palette and dark form specifications below describe the previous version and are superseded by this section.
 
