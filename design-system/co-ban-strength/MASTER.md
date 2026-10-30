@@ -1,5 +1,17 @@
 # Design System Master File
 
+## Current reference refinement — overrides the historical specification below
+
+- Source of current tokens: `winner.css`, loaded after `styles.css`.
+- Primary/accent #c91425, hover #a51020, white action text; page #f4f4f2, panel #ffffff, ink #202022, muted #616165, border #dededb.
+- Winner-inspired white horizontal masthead, dark photographic hero, condensed uppercase headings, red CTA, six exercise navigation icons. Retain Barlow Condensed + Barlow.
+- Desktop header 88px; mobile header 68px and fixed bottom navigation. Content max-width 1220px. Mobile exercise strip uses three columns; cards stack.
+- Small 2px radii, visible focus, 44px touch targets, 16px mobile form inputs. Respect reduced motion.
+- Hero photography: real Pexels photo 6550840 by Andres Ayrton, saved locally and cached offline. No AI-generated images.
+- First visit opens the landing page; starting a lesson enters existing onboarding. Preserve storage and progress schema.
+
+The orange/green palette and dark form specifications below describe the previous version and are superseded by this section.
+
 > **LOGIC:** When building a specific page, first check `design-system/pages/[page-name].md`.
 > If that file exists, its rules **override** this Master file.
 > If not, strictly follow the rules below.

@@ -32,13 +32,19 @@ State được lưu ở localStorage với key co-ban-strength-v1. Dữ liệu k
 
 ## Thiết kế
 
-Giao diện dùng hướng **Vibrant & Block-based / Dark OLED** từ UI/UX Pro Max cho sản phẩm Fitness/Gym: nền graphite, typography Barlow Condensed + Barlow, cam năng lượng, xanh lá cho tiến độ, thẻ góc gọn và các khối chỉ số kiểu training console. Desktop dùng sidebar; màn hình nhỏ dùng bottom navigation. Các control có focus state, keyboard navigation, touch target đủ lớn và prefers-reduced-motion.
+Giao diện hiện đi theo hướng **gym editorial / Winner-inspired**: masthead trắng, hero ảnh tập luyện nền đen, đỏ năng lượng, typography Barlow Condensed + Barlow, nút CTA rõ và dải module bên dưới hero. Ảnh hero/video placeholder dùng ảnh remote từ Unsplash để prototype nhẹ, không tự sinh ảnh và không thêm file ảnh lớn vào repo. Desktop dùng navigation ngang; màn hình nhỏ dùng header gọn và bottom navigation. Các control có focus state, keyboard navigation, touch target đủ lớn và prefers-reduced-motion.
 
 Design system được lưu tại design-system/co-ban-strength/MASTER.md. Khi đổi palette, spacing hoặc motion, cập nhật token trong styles.css và tài liệu này cùng lúc. Repo UI/UX Pro Max chỉ được dùng làm nguồn phương pháp và token thiết kế; ứng dụng vẫn là static vanilla HTML/CSS/JS.
 
+### Bản tinh chỉnh theo mẫu Winner
+
+`winner.css` tải sau `styles.css`, quản lý bảng màu đỏ–đen–trắng, hero, dải biểu tượng và responsive. Khách mới vào trang chủ trước; nút bắt đầu dẫn vào onboarding. Ảnh hero hiện lưu tại `assets/hero-training.jpg`, có cache offline, thay cho ảnh hero remote ở bản trước. Không dùng ảnh AI.
+
+Nguồn ảnh: [Andres Ayrton / Pexels — A Man and a Woman Training at the Gym](https://www.pexels.com/photo/a-man-and-a-woman-training-at-the-gym-6550840/).
+
 ### Đổi màu và theme
 
-Các token chính nằm ở đầu styles.css: --color-primary (cam), --color-accent (xanh lá), --color-background (nền), --panel (card) và --ink (chữ). Đổi token trước, sau đó kiểm tra contrast trên desktop và mobile. Không thêm emoji làm icon; dùng inline SVG trong index.html.
+Các token hiện hành nằm ở đầu winner.css: --color-primary và --color-accent (đỏ), --color-background (nền), --panel (card) và --ink (chữ). Đổi token trước, sau đó kiểm tra contrast trên desktop và mobile. Không thêm emoji làm icon; dùng inline SVG.
 
 ## Deploy GitHub Pages
 
