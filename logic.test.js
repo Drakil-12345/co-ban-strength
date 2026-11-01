@@ -1,7 +1,7 @@
 const assert = require("node:assert/strict");
 const { test } = require("node:test");
 const {
-  LESSONS, FINAL_QUIZ, freshState, calculateScore, completeLesson,
+  LESSONS, FINAL_QUIZ, ENTRY_QUIZ, freshState, calculateScore, completeLesson,
   progress, validPlan, makeICS, certificateEligible, exportState, importState,
   behaviorStage
 } = require("./logic.js");
@@ -10,6 +10,23 @@ test("seed có đủ 8 bài theo 4 tuần", () => {
   assert.equal(LESSONS.length, 8);
   assert.deepEqual(LESSONS.map((lesson) => lesson.week), [1,1,2,2,3,3,4,4]);
   assert.ok(LESSONS.every((lesson) => lesson.quiz.length >= 3));
+});
+
+test("câu hỏi quiz không lặp đề và mỗi đáp án đúng nằm trong miền hợp lệ", () => {
+  const all = LESSONS.flatMap((lesson) => lesson.quiz).concat(ENTRY_QUIZ);
+  const texts = all.map((item) => item.q);
+  assert.equal(new Set(texts).size, texts.length, "không được có câu hỏi lặp lại");
+  all.forEach((item) => {
+    assert.ok(item.options.length >= 3, "mỗi câu cần ít nhất 3 lựa chọn");
+    assert.ok(new Set(item.options).size === item.options.length, "các lựa chọn không trùng nhau");
+    assert.ok(item.answer >= 0 && item.answer < item.options.length, "đáp án nằm trong miền lựa chọn");
+  });
+});
+
+test("đáp án đúng không luôn nằm ở vị trí đầu tiên", () => {
+  const all = LESSONS.flatMap((lesson) => lesson.quiz).concat(ENTRY_QUIZ);
+  const zeros = all.filter((item) => item.answer === 0).length;
+  assert.ok(zeros > 0 && zeros < all.length / 2, "vị trí đáp án mặc lại phân tán, không game hóa ở A");
 });
 
 test("tính điểm quiz theo thang 100", () => {
@@ -57,6 +74,18 @@ test("chứng nhận chỉ đạt khi hoàn thành 8 bài và bài cuối từ 8
   state.finalAssessment.score = 80;
   assert.equal(certificateEligible(state), true);
   assert.equal(behaviorStage(state), 1);
+});
+
+test("ENTRY_QUIZ có 10 câu riêng cho đánh giá đầu vào", () => {
+  assert.equal(ENTRY_QUIZ.length, 10);
+  assert.equal(calculateScore(ENTRY_QUIZ.map((item) => item.answer), ENTRY_QUIZ), 100);
+  ENTRY_QUIZ.forEach((item) => { assert.ok(!LESSONS.some((lesson) => lesson.quiz.some((q) => q.q === item.q)), "câu đầu vào không trùng đề của bài học"); });
+});
+
+test("làm sai toàn bộ bài 1 (chọn B) vẫn dưới 60 điểm", () => {
+  const state = freshState();
+  const result = completeLesson(state, "lesson-1", [1, 1, 1]);
+  assert.equal(result.completed, false);
 });
 
 test("export/import giữ nguyên tiến độ", () => {

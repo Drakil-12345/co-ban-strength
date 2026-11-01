@@ -16,9 +16,12 @@ Không cần framework hoặc build step. Các file chính:
 - styles.css: design system CƠ BẢN, responsive desktop/mobile.
 - winner.css: tinh chỉnh tham chiếu Winner (palette đỏ–đen–trắng, hero ảnh, mobile nav).
 - ux.css: lớp tinh chỉnh UX 2026 (dashboard dẫn đường, ticker lộ trình, giáo án, checklist kế hoạch).
-- logic.js: dữ liệu 8 bài và logic thuần cho quiz, tiến độ, kế hoạch, ICS, export/import.
+- modern.css: lớp polish hiện đại tải sau cùng (glass nav, radius mềm, motion eased, palette trung tính + một đỏ nhấn).
+- ui-effects.js: hiệu ứng chỉ dùng để trình bày (reveal, ripple, count-up, progress ring, tilt) — tôn trọng prefers-reduced-motion, không đụng logic.
+- rewards.js: lớp thành tựu + xếp hạng chỉ ĐỌC state (badge 8 bài học, 5 huy hiệu hành động, bậc I–IV theo mốc 2/4/6/8 của logic.js, nút chia sẻ hạng vào clipboard) — render thêm vào sau `.achievement-grid` trên màn Tiến độ, không ghi state, không đụng app.js/logic.js.
+- logic.js: dữ liệu 8 bài và logic thuần cho quiz, tiến độ, kế hoạch, ICS, export/import. Quiz bài học đã viết lại rõ nghĩa và không lặp; `ENTRY_QUIZ` là bộ 10 câu đánh giá đầu vào riêng biệt (không tái sử dụng 3 câu của bài 8 như bản trước); đáp án đúng rải vị trí thay vì luôn nằm ở lựa chọn đầu.
 - app.js: render màn hình, engine nextStep (biết việc cần làm tiếp theo), tương tác và lưu localStorage.
-- service-worker.js: cache offline v6; dùng chiến lược network-first để bản mới luôn được nhận.
+- service-worker.js: cache offline v13 (logic.js với bộ quiz viết lại + ENTRY_QUIZ, modern.css?v=7, ui-effects.js, rewards.js); dùng chiến lược network-first để bản mới luôn được nhận.
 - logic.test.js: unit test bằng Node test runner.
 
 Chạy test: node --test logic.test.js
@@ -53,7 +56,7 @@ Design system được lưu tại design-system/co-ban-strength/MASTER.md. Khi �
 
 ### Bản tinh chỉnh theo mẫu Winner
 
-`winner.css` tải sau `styles.css`, quản lý bảng màu đỏ–đen–trắng, hero, dải biểu tượng và responsive. `ux.css` tải sau cùng cho các tinh chỉnh trải nghiệm (dashboard, ticker, giáo án). Ảnh hero hiện lưu tại `assets/hero-training.jpg`, có cache offline, thay cho ảnh hero remote ở bản trước. Không dùng ảnh AI.
+`winner.css` tải sau `styles.css`, quản lý bảng màu đỏ–đen–trắng, hero, dải biểu tượng và responsive. `ux.css` tải cho các tinh chỉnh trải nghiệm (dashboard, ticker, giáo án). `modern.css` (kèm `ui-effects.js`) là lớp polish tải sau cùng: bề mặt trung tính 90% + một đỏ `#c91425` duy nhất làm điểm nhấn (kiểu Nike/Apple/Linear), card trắng viền hairline, bóng hai tầng tĩnh, glass nav, animation chỉ chạy khi `prefers-reduced-motion` không bật — layer này không đổi state hay flow. Ảnh hero hiện lưu tại `assets/hero-training.jpg`, có cache offline, thay cho ảnh hero remote ở bản trước. Không dùng ảnh AI.
 
 Nguồn ảnh: [Andres Ayrton / Pexels — A Man and a Woman Training at the Gym](https://www.pexels.com/photo/a-man-and-a-woman-training-at-the-gym-6550840/).
 
