@@ -1,4 +1,4 @@
-const CACHE = "co-ban-strength-v6";
+const CACHE = "co-ban-strength-v13";
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,8 +8,17 @@ const ASSETS = [
   "./winner.css?v=5",
   "./ux.css",
   "./ux.css?v=1",
+  "./modern.css",
+  "./modern.css?v=2",
+  "./modern.css?v=3",
+  "./modern.css?v=4",
+  "./modern.css?v=5",
+  "./modern.css?v=6",
+  "./modern.css?v=7",
   "./logic.js",
   "./app.js",
+  "./ui-effects.js",
+  "./rewards.js",
   "./manifest.webmanifest",
   "./assets/icon.svg",
   "./assets/hero-training.jpg"
