@@ -69,6 +69,68 @@
     return { current: current, next: next, ratio: ratio };
   }
 
+  /* ---------- badge artwork (inline SVG, palette: red accent + neutrals) ---------- */
+
+  function svgOpen(size) {
+    return '<svg class="{{cls}}" viewBox="0 0 48 48" width="' + size + '" height="' + size + '" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">';
+  }
+  function svgText(x, y, size, content) {
+    return '<text x="' + x + '" y="' + y + '" font-size="' + size + '" font-weight="800" text-anchor="middle" fill="currentColor" stroke="none">' + content + '</text>';
+  }
+
+  function actionIcon(key) {
+    var i = svgOpen(44).replace("{{cls}}", "ab-svg");
+    if (key === "perfect") return i +
+      '<circle cx="24" cy="24" r="21"/>' +
+      '<path d="M24 11.5l3.7 7.6 8.4 1.2-6 5.9 1.4 8.3L24 30.5l-7.5 4 1.4-8.3-6-5.9 8.4-1.2z"/>' +
+      '</svg>';
+    if (key === "plan") return i +
+      '<rect x="12" y="9" width="24" height="30" rx="3"/>' +
+      '<rect x="19" y="6" width="10" height="6" rx="2"/>' +
+      '<path d="M18 25l4 4 8.5-8.5"/>' +
+      '</svg>';
+    if (key === "guides") return i +
+      '<path d="M24 12c-3.5-2.6-9-2.7-14-.6v25c5-2.1 10.5-2 14 .6 3.5-2.6 9-2.7 14-.6v-25c-5-2.1-10.5-2-14 .6z"/>' +
+      '<path d="M24 12v25"/>' +
+      '</svg>';
+    if (key === "ics") return i +
+      '<rect x="9" y="12" width="30" height="27" rx="3"/>' +
+      '<path d="M9 19.5h30M17 10v5M31 10v5"/>' +
+      svgText(24, 33.5, 11, "30") +
+      '</svg>';
+    if (key === "cert") return i +
+      '<circle cx="24" cy="19" r="10"/>' +
+      '<circle cx="24" cy="19" r="5.2"/>' +
+      '<path d="M18.5 27.5L15 43l9-5 9 5-3.5-15.5"/>' +
+      '</svg>';
+    return i + '</svg>';
+  }
+
+  function lessonCoin(index, status) {
+    var svg = '<svg class="lt-svg" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">' +
+      (status === "locked"
+        ? '<circle cx="24" cy="24" r="19" stroke-dasharray="3.5 4"/>'
+        : '<circle cx="24" cy="24" r="19"/>') +
+      '<circle cx="24" cy="24" r="14" stroke-width=".8" stroke-dasharray="1.5 3"/>' +
+      svgText(24, 30.5, 16, index < 10 ? "0" + index : String(index)) +
+      (status === "completed"
+        ? '<g class="lt-check"><circle cx="36.5" cy="36.5" r="7" fill="#4d9e61" stroke="none"/><path d="M33.2 36.6l2.4 2.4 4-4.6" stroke="#fff" stroke-width="1.8"/></g>'
+        : "") +
+      '</svg>';
+    return '<span class="lt-coin" aria-hidden="true">' + svg + '</span>';
+  }
+
+  function laurel() {
+    /* engraved laurel wreath behind the tier numeral */
+    return '<svg class="rank-laurel" viewBox="0 0 48 48" width="88" height="88" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">' +
+      '<circle cx="24" cy="24" r="22" opacity=".55"/>' +
+      '<path d="M14 8C9 15 7.5 24 10 33c1.6 3.2 3.9 5.6 6.8 7" opacity=".9"/>' +
+      '<path d="M34 8c5 7 6.5 16 4 25-1.6 3.2-3.9 5.6-6.8 7" opacity=".9"/>' +
+      '<path d="M9.5 28l-3-1.4M11 22l-3.2-.9M13.5 17l-3-1.7M17 12.8l-2.4-2.3M38.5 28l3-1.4M37 22l3.2-.9M34.5 17l3-1.7M31 12.8l2.4-2.3" opacity=".8"/>' +
+      '<path d="M17 40l7 3 7-3" opacity=".9"/>' +
+      '</svg>';
+  }
+
   /* ---------- sections ---------- */
 
   function rankCard(state, count) {
@@ -78,7 +140,8 @@
     else if (info.next) sub = count + "/8 bài học · còn " + (info.next.min - count) + " bài để lên Bậc " + info.next.numeral + " " + esc(info.next.name) + ".";
     else sub = "8/8 bài học · bạn đã mở đủ bốn bậc.";
     return '<article class="reward-rank" data-tier="' + info.current.numeral + '">' +
-      '<div class="rank-medal" aria-hidden="true"><span>' + info.current.numeral + '</span><small>BẬC</small></div>' +
+      '<div class="rank-medal" aria-hidden="true">' + laurel() +
+      '<span class="rank-numeral">' + info.current.numeral + '</span><small class="rank-tag">BẬC</small></div>' +
       '<div class="rank-body">' +
       '<p class="kicker">XẾP HẠNG TIẾN BỘ</p>' +
       '<h3>Bậc ' + info.current.numeral + ' · ' + esc(info.current.name) + '</h3>' +
@@ -103,7 +166,7 @@
         stateText = "Chưa mở";
       }
       return '<li class="lesson-tile ' + status + '">' +
-        '<span class="lt-num" aria-hidden="true">' + pad(index + 1) + '</span>' +
+        lessonCoin(index + 1, status) +
         '<strong>' + esc(lesson.title) + '</strong>' +
         '<small class="lt-state">' + stateText + '</small>' +
         '</li>';
@@ -133,8 +196,9 @@
     return ACTIONS.map(function (action) {
       var earned = earnedAction(state, action.key);
       return '<li class="action-badge' + (earned ? " earned" : "") + '">' +
-        '<strong>' + action.label + '</strong>' +
-        '<small>' + action.desc + '</small>' +
+        '<span class="ab-icon" aria-hidden="true">' + actionIcon(action.key) + '</span>' +
+        '<span class="ab-text"><strong>' + action.label + '</strong>' +
+        '<small>' + action.desc + '</small></span>' +
         '<span class="ab-mark">' + (earned ? "ĐẠT" : "CHƯA") + '</span>' +
         '</li>';
     }).join("");

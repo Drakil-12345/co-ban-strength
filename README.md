@@ -18,10 +18,11 @@ Không cần framework hoặc build step. Các file chính:
 - ux.css: lớp tinh chỉnh UX 2026 (dashboard dẫn đường, ticker lộ trình, giáo án, checklist kế hoạch).
 - modern.css: lớp polish hiện đại tải sau cùng (glass nav, radius mềm, motion eased, palette trung tính + một đỏ nhấn).
 - ui-effects.js: hiệu ứng chỉ dùng để trình bày (reveal, ripple, count-up, progress ring, tilt) — tôn trọng prefers-reduced-motion, không đụng logic.
-- rewards.js: lớp thành tựu + xếp hạng chỉ ĐỌC state (badge 8 bài học, 5 huy hiệu hành động, bậc I–IV theo mốc 2/4/6/8 của logic.js, nút chia sẻ hạng vào clipboard) — render thêm vào sau `.achievement-grid` trên màn Tiến độ, không ghi state, không đụng app.js/logic.js.
+- rewards.js: lớp thành tựu chỉ ĐỌC state — badge vẽ bằng SVG thủ công (coin số 01–08 cho 8 bài học, 5 huy hiệu hành động theo pictogram riêng: sao / clipboard / sách mở / lịch 30 / ruy băng, vòng nguyệt quế khắc quanh chữ số bậc I–IV theo mốc 2/4/6/8 của logic.js), đạt được → đỏ khắc, chưa đạt → xám kẻ nét; nút chia sẻ hạng vào clipboard — render thêm vào sau `.achievement-grid` trên màn Tiến độ, không ghi state, không đụng app.js/logic.js.
+- leaderboard.js: bảng xếp hạng demo ("DEMO · chưa kết nối") chỉ ĐỌC state — 14 peer mô phỏng + hàng "BẠN" nổi bật + bạn bè nhập bằng mã `CB|nick|bậc(0-4)|bài|điểm`; lưu riêng `co-ban-strength-leader-v1` (nick) và `co-ban-strength-friends-v1` (bạn bè), không ghi state app. Cổng `Transport` (fetch/publish Promise) sẵn sàng cắm backend thật — kvdb.io bucket `2Apc9DmZqdPcLkcEdvfAbV` đã tạo nhưng **chờ xác minh email** (403 khi POST) hoặc Firebase RTDB; khi cắm chỉ thay 2 hàm, UI giữ nguyên.
 - logic.js: dữ liệu 8 bài và logic thuần cho quiz, tiến độ, kế hoạch, ICS, export/import. Quiz bài học đã viết lại rõ nghĩa và không lặp; `ENTRY_QUIZ` là bộ 10 câu đánh giá đầu vào riêng biệt (không tái sử dụng 3 câu của bài 8 như bản trước); đáp án đúng rải vị trí thay vì luôn nằm ở lựa chọn đầu.
-- app.js: render màn hình, engine nextStep (biết việc cần làm tiếp theo), tương tác và lưu localStorage.
-- service-worker.js: cache offline v13 (logic.js với bộ quiz viết lại + ENTRY_QUIZ, modern.css?v=7, ui-effects.js, rewards.js); dùng chiến lược network-first để bản mới luôn được nhận.
+- app.js: render màn hình, engine nextStep (biết việc cần làm tiếp theo), tương tác và lưu localStorage. Chỉ đổi 2 dòng so với bản đã test: màn hình đánh giá đầu vào chuyển sang `L.ENTRY_QUIZ`.
+- service-worker.js: cache offline v15 (logic.js mới + ENTRY_QUIZ, modern.css?v=8, rewards.js, leaderboard.js, ui-effects.js fix guard text-node); dùng chiến lược network-first để bản mới luôn được nhận.
 - logic.test.js: unit test bằng Node test runner.
 
 Chạy test: node --test logic.test.js
@@ -34,7 +35,7 @@ Mỗi thời điểm giao diện chỉ còn một hành động chính được 
 2. Học 8 bài (mỗi bài 5 phút, quiz 60 điểm để qua).
 3. Chốt 2 ngày tập: checklist 3 mục, prefill từ hồ sơ, nút lưu sáng khi đủ thông tin.
 4. Mở giáo án 30 phút (dialog, dùng được cho Nhà/Gym) + tải .ics nhắc lịch.
-5. Hết luồng → nhắc giữ nhịp 2 buổi/tuần + xem thành tựu.
+5. Hết luồng → nhắc giữ nhịp 2 buổi/tuần + xem thành tựu: huy hiệu SVG theo tiến độ và bảng xếp hạng demo (nickname riêng, mã chia sẻ ghép bạn bè, đánh dấu rõ "chưa kết nối" đến khi có backend online).
 
 Điều hướng: `Trang chủ / Bài học / Kế hoạch / Tiến độ / Cài đặt`; trên mobile nút đỏ giữa "Học" luôn dẫn tới việc tiếp theo. URL hỗ trợ `#home / #roadmap / #plan / #achievements / #settings / #onboarding` cho deep link + refresh không mất trang.
 
