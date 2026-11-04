@@ -99,12 +99,16 @@
     if (el.dataset.fxTarget !== undefined) to = Number(el.dataset.fxTarget);
     if (!isFinite(to)) return;
     el.dataset.fxTarget = String(to);
+    /* score-number elements keep a trailing <small>: animate only the leading text node */
+    var node = (el.firstChild && el.firstChild.nodeType === 3) ? el.firstChild : null;
     var start = null;
     var duration = to > 20 ? 900 : 620;
     function frame(now) {
       if (start === null) start = now;
       var t = clamp((now - start) / duration, 0, 1);
-      el.textContent = String(Math.round(easeOutCubic(t) * to));
+      var value = String(Math.round(easeOutCubic(t) * to));
+      if (node) node.nodeValue = value;
+      else el.textContent = value;
       if (t < 1) raf(frame);
     }
     raf(frame);
@@ -136,7 +140,7 @@
       Array.prototype.forEach.call(root.querySelectorAll(".score-number"), function (el) {
         var raw = (el.textContent || "").trim();
         var match = raw.match(/^\d+/);
-        if (match) animateNumber(el.firstChild && el.firstChild.nodeType === 3 ? el.firstChild : el, Number(match[0]));
+        if (match) animateNumber(el, Number(match[0]));
       });
     }
     Array.prototype.forEach.call(root.querySelectorAll(".hero-ring"), animateRing);
