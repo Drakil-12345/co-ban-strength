@@ -1,4 +1,4 @@
-const CACHE = "co-ban-strength-v16";
+const CACHE = "co-ban-strength-v17";
 const ASSETS = [
   "./",
   "./index.html",
@@ -25,7 +25,9 @@ const ASSETS = [
   "./leaderboard.js",
   "./manifest.webmanifest",
   "./assets/icon.svg",
-  "./assets/hero-training.jpg"
+  "./assets/hero-training.jpg",
+  "./assets/bai7-home.jpg",
+  "./assets/bai7-gym.jpg"
 ];
 
 self.addEventListener("install", (event) => {

@@ -89,4 +89,4 @@ Sau khi workflow chạy, bật Pages nếu GitHub yêu cầu và mở URL reposi
 
 ## Giới hạn prototype
 
-Prototype đo việc mở và hoàn thành bài, điểm quiz, lập kế hoạch và mở giáo án. Nó không xác minh người dùng đã tập thật hoặc duy trì đủ hai buổi mỗi tuần. Video đang là placeholder cho đến khi thêm URL vào dữ liệu bài học. Email tự động, tài khoản thật, backend và analytics chưa nằm trong bản offline này.
+Prototype đo việc mở và hoàn thành bài, điểm quiz, lập kế hoạch và mở giáo án. Nó không xác minh người dùng đã tập thật hoặc duy trì đủ hai buổi mỗi tuần. Nội dung 8 bài được đối chiếu với bộ PDF CƠ BẢN; Bài 1–6 và Bài 8 mở video YouTube tương ứng, còn Bài 7 hiển thị infographic Nhà/Gym trong modal. Email tự động, tài khoản thật, backend và analytics chưa nằm trong bản offline này.

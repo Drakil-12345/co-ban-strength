@@ -504,6 +504,15 @@
 .lesson-media strong { display: block; color: #171719; font-size: 13px; }
 .lesson-media small { display: block; margin-top: 3px; color: #777; font-size: 11px; line-height: 1.5; }
 .lesson-media.is-placeholder { border-style: dashed; background: #fafafa; }
+.lesson-points { margin: 20px 0; padding: 17px 18px; background: #fafafa; border: 1px solid #e5e5e5; border-left: 3px solid #c91425; }
+.lesson-points .kicker, .lesson-infographics .kicker { margin-bottom: 9px; }
+.lesson-points ul { margin: 0; padding-left: 19px; display: grid; gap: 8px; color: #444; font-size: 12px; line-height: 1.55; }
+.lesson-infographics { margin: 20px 0; }
+.infographic-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.infographic-grid a { display: block; color: #171719; text-decoration: none; border: 1px solid #e5e5e5; background: #fff; transition: border-color .2s, transform .2s; }
+.infographic-grid a:hover { border-color: #c91425; transform: translateY(-2px); }
+.infographic-grid img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.infographic-grid strong { display: block; padding: 9px 11px 11px; font-size: 11px; }
 .modal-progress { height: 4px; margin: 14px 0 0; overflow: hidden; background: #ececea; }
 .modal-progress span {
   display: block;

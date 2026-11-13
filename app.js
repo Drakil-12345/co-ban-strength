@@ -346,9 +346,15 @@
     const media = lesson.videoUrl
       ? '<a class="lesson-media" href="' + esc(lesson.videoUrl) + '" target="_blank" rel="noopener"><span aria-hidden="true">▶</span><div><strong>Xem video bài học</strong><small>Mở trong tab mới</small></div></a>'
       : '<div class="lesson-media is-placeholder"><span aria-hidden="true">▶</span><div><strong>Video đang cập nhật</strong><small>Bạn vẫn có thể đọc tóm tắt và làm quiz bên dưới.</small></div></div>';
+    const keyPoints = lesson.keyPoints && lesson.keyPoints.length
+      ? '<section class="lesson-points"><p class="kicker">ĐIỂM CẦN NHỚ</p><ul>' + lesson.keyPoints.map((point) => '<li>' + esc(point) + '</li>').join("") + '</ul></section>'
+      : "";
+    const infographics = lesson.infographics && lesson.infographics.length
+      ? '<section class="lesson-infographics"><p class="kicker">GIÁO ÁN THAM KHẢO</p><div class="infographic-grid">' + lesson.infographics.map((item) => '<a href="' + esc(item.src) + '" target="_blank" rel="noopener"><img src="' + esc(item.src) + '" alt="' + esc(item.label) + '" loading="lazy"><strong>' + esc(item.label) + '</strong></a>').join("") + '</div></section>'
+      : "";
     lessonDialog.innerHTML = '<div class="modal-inner"><div class="modal-head"><div><p class="kicker">BÀI ' + String(number).padStart(2, "0") + '/08 · ' + esc(lesson.duration) + '</p><h2>' + esc(lesson.title) + '</h2></div><button class="close" data-action="close-modal" aria-label="Đóng">×</button></div>' +
       '<div class="modal-progress" aria-hidden="true"><span style="width:' + ((number / L.LESSONS.length) * 100) + '%"></span></div>' + media +
-      '<p class="modal-copy"><strong>Hôm nay bạn sẽ học:</strong> ' + esc(lesson.focus) + ' ' + esc(lesson.summary) + '</p>' +
+      '<p class="modal-copy"><strong>Hôm nay bạn sẽ học:</strong> ' + esc(lesson.focus) + ' ' + esc(lesson.summary) + '</p>' + keyPoints + infographics +
       '<div class="safety">' + esc(lesson.safetyNote) + '</div>' +
       (lesson.tryAction ? '<div class="try-box" style="margin-top:12px"><strong>Thử trong 60 giây</strong><br>' + esc(lesson.tryAction) + '</div>' : '') +
       '<form id="lesson-quiz-form"><div class="quiz-head"><p class="kicker">QUIZ · ' + lesson.quiz.length + ' CÂU</p>' + best + '<span class="muted">Đạt 60 điểm để hoàn thành</span></div><div class="quiz-list">' +
