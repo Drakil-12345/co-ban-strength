@@ -8,6 +8,15 @@ CƠ BẢN là prototype PWA offline giúp người mới học nền tảng tậ
 
 Mở http://localhost:4173. Chạy qua HTTP để service worker hoạt động.
 
+## Import vào Google AI Studio
+
+Project có `package.json` và dùng Vite để AI Studio cài dependency và chạy được app:
+
+    npm install
+    npm run dev
+
+Khi import từ GitHub, giữ nguyên các file `package.json` và `package-lock.json`. Không cần đổi app sang React hoặc thêm framework khác.
+
 ## Phát triển
 
 Không cần framework hoặc build step. Các file chính:
@@ -81,4 +90,3 @@ Sau khi workflow chạy, bật Pages nếu GitHub yêu cầu và mở URL reposi
 ## Giới hạn prototype
 
 Prototype đo việc mở và hoàn thành bài, điểm quiz, lập kế hoạch và mở giáo án. Nó không xác minh người dùng đã tập thật hoặc duy trì đủ hai buổi mỗi tuần. Video đang là placeholder cho đến khi thêm URL vào dữ liệu bài học. Email tự động, tài khoản thật, backend và analytics chưa nằm trong bản offline này.
-
