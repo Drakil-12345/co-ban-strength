@@ -2,7 +2,7 @@
   "use strict";
   const L = window.CoBanLogic;
   const STORAGE_KEY = "co-ban-strength-v1";
-  const ROUTES = ["home", "roadmap", "plan", "achievements", "settings", "onboarding"];
+  const ROUTES = ["home", "roadmap", "plan", "achievements", "ranking", "settings", "onboarding"];
   const routeFromHash = () => {
     const hash = location.hash.replace("#", "");
     return ROUTES.includes(hash) ? hash : "home";
@@ -24,7 +24,7 @@
   function loadState() { try { return L.normalizeState(JSON.parse(localStorage.getItem(STORAGE_KEY))); } catch (_) { return L.freshState(); } }
   function notify(message) { toastNode.textContent = message; toastNode.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => toastNode.classList.remove("show"), 2800); }
   function routeTitle() {
-    return { home: "Từ đã lưu đến đã tập.", roadmap: "Bài học 4 tuần.", plan: "Kế hoạch tập.", achievements: "Tiến độ & thành tựu.", settings: "Cài đặt & dữ liệu.", onboarding: "Bắt đầu từ đây." }[route] || "CƠ BẢN";
+    return { home: "Từ đã lưu đến đã tập.", roadmap: "Bài học 4 tuần.", plan: "Kế hoạch tập.", achievements: "Tiến độ & thành tựu.", ranking: "Bảng xếp hạng cùng tiến.", settings: "Cài đặt & dữ liệu.", onboarding: "Bắt đầu từ đây." }[route] || "CƠ BẢN";
   }
 
   function navigate(next) {
@@ -65,6 +65,7 @@
     else if (route === "roadmap") renderRoadmap();
     else if (route === "plan") renderPlan();
     else if (route === "achievements") renderAchievements();
+    else if (route === "ranking") renderRanking();
     else renderSettings();
   }
 
@@ -304,6 +305,12 @@
       '<div class="achievement-grid">' + badges + '</div>' +
       '<section class="panel achievement-next"><div><p class="kicker">VIỆC TIẾP THEO</p><h3>' + (upcoming ? esc(upcoming.title) : "Chốt kế hoạch hai buổi") + '</h3><p>' + (upcoming ? esc(upcoming.summary) : "Chọn hai ngày và mở giáo án để bắt đầu.") + '</p></div>' + nextCta + '</section>' +
       '<section class="panel" style="margin-top:17px"><p class="kicker">ĐIỂM ĐO</p><h3>Giới hạn của prototype</h3><p class="muted" style="line-height:1.65;font-size:12px">CƠ BẢN có thể xác nhận bạn đã học, lập kế hoạch và mở giáo án. Website không tự khẳng định bạn đã duy trì tập đủ hai buổi mỗi tuần.</p></section></section>';
+  }
+
+  /* Màn Xếp hạng: khung tối giản — nội dung bảng do leaderboard.js (layer
+     chỉ đọc) đổ vào #fx-ranking-root. app.js không biết chi tiết bảng. */
+  function renderRanking() {
+    root.innerHTML = '<section class="screen"><div class="section-head"><div><p class="kicker">CÙNG TIẾN, CÙNG BỀN</p><h2>Bảng xếp hạng cùng tiến.</h2><p>So bài học hoàn thành trước, rồi đến điểm cao nhất. Nhập mã của bạn bè để cùng một bảng thi đua.</p></div></div><div id="fx-ranking-root"></div></section>';
   }
 
   function renderSettings() {

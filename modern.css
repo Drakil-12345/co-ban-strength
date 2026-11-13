@@ -666,49 +666,71 @@ dialog.modal[open]::backdrop {
 }
 .modal-progress span:after { display: none; } /* no shimmer on the ticks */
 
-/* --- Rewards extras (rewards.js): rank card, lesson tiles, action badges --- */
-/* Read-only layer injected after .achievement-grid on the achievements route. */
+
+/* --- Rewards v9: trophy case — huy chương có ruy băng, coin hành trình với
+   mốc 2/4/6/8, tủ huy hiệu nền tối + hiệu ứng "đóng dấu". Palette trung tính
+   + một đỏ #c91425; motion chỉ chạy khi prefers-reduced-motion cho phép. --- */
 
 #fx-rewards { margin-top: 26px; }
+
+/* -- thẻ bậc ------------------------------------------------------------ */
 
 .reward-rank {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 22px;
-  padding: 24px 26px;
+  gap: 26px;
+  padding: 26px 28px 22px;
   border-radius: var(--fx-radius);
   color: #f4f4f2;
   background:
-    radial-gradient(460px 220px at 10% 0%, rgba(201, 20, 37, .18), transparent 62%),
-    linear-gradient(180deg, #17181b, #101114);
+    radial-gradient(520px 260px at 88% -12%, rgba(201, 20, 37, .16), transparent 60%),
+    radial-gradient(430px 220px at 2% 2%, rgba(201, 20, 37, .13), transparent 55%),
+    linear-gradient(180deg, #17181b, #0e0f12);
   border: 1px solid rgba(255, 255, 255, .08);
   border-left: 3px solid var(--fx-red);
   box-shadow: var(--fx-shadow-m);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .rank-medal {
+  position: relative;
   display: grid;
   place-items: center;
   align-content: center;
-  gap: 3px;
-  width: 88px;
-  height: 88px;
+  gap: 2px;
+  width: 104px;
+  height: 104px;
   flex: none;
   border-radius: 50%;
-  border: 1px solid rgba(201, 20, 37, .55);
-  background: radial-gradient(72% 72% at 30% 24%, rgba(201, 20, 37, .32), rgba(201, 20, 37, .05) 72%);
-  box-shadow: 0 12px 32px rgba(201, 20, 37, .2), inset 0 1px 0 rgba(255, 255, 255, .08);
+  border: 1px solid rgba(201, 20, 37, .6);
+  background:
+    radial-gradient(74% 74% at 30% 22%, rgba(201, 20, 37, .38), rgba(201, 20, 37, .05) 72%),
+    linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, 0));
+  box-shadow:
+    0 16px 40px rgba(201, 20, 37, .22),
+    inset 0 1px 0 rgba(255, 255, 255, .1);
 }
-.rank-medal span { font-size: 30px; font-weight: 800; line-height: 1; letter-spacing: .02em; color: #fff; }
-.rank-medal small { font-size: 9px; font-weight: 700; letter-spacing: .24em; color: rgba(255, 255, 255, .55); text-indent: .24em; }
+.rank-laurel { position: absolute; inset: -2px; width: calc(100% + 4px); height: calc(100% + 4px); color: rgba(201, 20, 37, .8); }
+.rank-medal .rank-numeral, .rank-medal .rank-tag { position: relative; z-index: 1; }
+.rank-medal .rank-numeral { font-size: 34px; font-weight: 800; line-height: 1; letter-spacing: .02em; color: #fff; }
+.rank-medal .rank-tag { font-size: 9px; font-weight: 700; letter-spacing: .24em; color: rgba(255, 255, 255, .55); text-indent: .24em; }
+.rank-ribbon {
+  position: absolute;
+  top: calc(100% - 7px);
+  left: 50%;
+  transform: translateX(-50%) translateY(2px);
+  z-index: 0;
+  color: var(--fx-red);
+  filter: drop-shadow(0 7px 10px rgba(201, 20, 37, .28));
+}
 
 .rank-body { flex: 1; min-width: 0; }
 .rank-body .kicker { color: rgba(255, 255, 255, .52); }
-.rank-body h3 { margin: 5px 0 0; font-size: 21px; font-weight: 750; letter-spacing: -.01em; color: #fff; }
-.rank-sub { margin: 6px 0 14px; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .66); }
+.rank-body h3 { margin: 5px 0 0; font-size: 22px; font-weight: 750; letter-spacing: -.01em; color: #fff; }
+.rank-sub { margin: 6px 0 0; font-size: 13px; line-height: 1.5; color: rgba(255, 255, 255, .66); }
 
+.rank-track-wrap { margin-top: 16px; }
 .rank-track {
   height: 6px;
   border-radius: 999px;
@@ -722,8 +744,30 @@ dialog.modal[open]::backdrop {
   background: linear-gradient(90deg, var(--fx-red), #ff4d5e);
   transition: width .6s var(--fx-ease);
 }
+.rank-ticks { position: relative; height: 17px; margin-top: 8px; }
+.rank-ticks i {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  min-width: 20px;
+  padding: 2px 5px;
+  border-radius: 999px;
+  border: 1px dashed rgba(255, 255, 255, .26);
+  background: rgba(20, 21, 25, .92);
+  font-size: 8.5px;
+  font-weight: 800;
+  font-style: normal;
+  text-align: center;
+  color: rgba(255, 255, 255, .5);
+}
+.rank-ticks i.past {
+  border-style: solid;
+  border-color: rgba(201, 20, 37, .6);
+  background: rgba(201, 20, 37, .3);
+  color: #fff;
+}
 
-.rank-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 16px; }
+.rank-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 15px; }
 .rank-chip {
   padding: 6px 12px;
   border-radius: 999px;
@@ -734,15 +778,18 @@ dialog.modal[open]::backdrop {
   background: rgba(255, 255, 255, .08);
   border: 1px solid rgba(255, 255, 255, .14);
 }
-.reward-rank .button.rank-share,
-.reward-rank .rank-share { margin-left: auto; background: transparent; color: #fff; border-color: rgba(255, 255, 255, .26); }
+.reward-rank .rank-share { margin-left: 0; background: transparent; color: #fff; border-color: rgba(255, 255, 255, .26); }
 .reward-rank .rank-share:hover { border-color: #fff; color: #fff; }
 .reward-rank .rank-share.copied { color: #7cd992; border-color: rgba(124, 217, 146, .45); }
 .reward-rank .rank-share.failed { color: #b9b9b4; border-color: rgba(255, 255, 255, .16); }
+.reward-rank .rank-ranking-link { background: transparent; color: rgba(255, 255, 255, .75); border-color: transparent; text-decoration: underline; text-underline-offset: 3px; }
+.reward-rank .rank-ranking-link:hover { color: #fff; }
+
+/* -- cột thành tựu ------------------------------------------------------ */
 
 .reward-columns {
   display: grid;
-  grid-template-columns: 1.3fr 1fr;
+  grid-template-columns: 1.28fr 1fr;
   gap: 14px;
   margin-top: 14px;
 }
@@ -754,7 +801,38 @@ dialog.modal[open]::backdrop {
   border: 1px solid var(--fx-border);
   box-shadow: var(--fx-shadow-s);
 }
-.reward-block header h3 { margin: 4px 0 16px; font-size: 15px; font-weight: 700; letter-spacing: -.005em; color: var(--fx-ink); }
+.reward-block > header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+}
+.reward-block header h3 { margin: 4px 0 0; font-size: 15px; font-weight: 700; letter-spacing: -.005em; color: var(--fx-ink); }
+.rb-count {
+  flex: none;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px dashed rgba(17, 18, 20, .3);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .1em;
+  color: rgba(17, 18, 20, .55);
+  font-variant-numeric: tabular-nums;
+}
+
+.rew-block-dark, .reward-block.dark {
+  background:
+    radial-gradient(420px 200px at 100% 0%, rgba(201, 20, 37, .14), transparent 55%),
+    linear-gradient(180deg, #17181b, #101114);
+  border-color: rgba(255, 255, 255, .08);
+  box-shadow: var(--fx-shadow-m);
+}
+.reward-block.dark header .kicker { color: rgba(255, 255, 255, .5); }
+.reward-block.dark header h3 { color: #fff; }
+.reward-block.dark .rb-count { color: rgba(255, 255, 255, .6); border-color: rgba(255, 255, 255, .25); }
+
+/* -- coin hành trình 8 bài ---------------------------------------------- */
 
 .reward-lessons {
   display: grid;
@@ -768,14 +846,16 @@ dialog.modal[open]::backdrop {
 .lesson-tile {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 7px;
   min-width: 0;
   padding: 14px 14px 12px;
   border-radius: 12px;
   background: #fcfcfb;
   border: 1px solid var(--fx-border);
 }
-.lt-num { font-size: 22px; font-weight: 800; line-height: 1; letter-spacing: .02em; color: rgba(17, 18, 20, .26); }
+.lt-coin { display: block; width: 46px; height: 46px; color: rgba(17, 18, 20, .3); }
+.lt-coin .lt-svg { width: 46px; height: 46px; }
+.lt-num { display: none; } /* thay bằng coin */
 .lesson-tile strong {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -789,22 +869,30 @@ dialog.modal[open]::backdrop {
 }
 .lt-state { font-size: 9.5px; font-weight: 750; letter-spacing: .09em; color: rgba(17, 18, 20, .42); }
 
+.lesson-tile.available { border-color: rgba(201, 20, 37, .4); }
+.lesson-tile.available .lt-coin { color: rgba(17, 18, 20, .52); }
+.lesson-tile.available .lt-now { fill: var(--fx-red); color: var(--fx-red); }
+.lesson-tile.available .lt-state { color: var(--fx-red); }
+
 .lesson-tile.completed {
   background: var(--fx-surface);
   border-color: rgba(77, 158, 97, .35);
   box-shadow: inset 3px 0 0 #4d9e61;
 }
+.lesson-tile.completed .lt-coin { color: var(--fx-red); }
 .lesson-tile.completed .lt-state { color: #2f6b40; }
 
 .lesson-tile.locked { background: #f7f7f4; border-style: dashed; border-color: rgba(17, 18, 20, .14); }
-.lesson-tile.locked .lt-num { color: rgba(17, 18, 20, .16); }
+.lesson-tile.locked .lt-coin { color: rgba(17, 18, 20, .16); }
 .lesson-tile.locked strong { color: rgba(17, 18, 20, .45); }
 .lesson-tile.locked .lt-state { color: rgba(17, 18, 20, .32); }
+
+/* -- tủ huy hiệu hành động (nền tối) ------------------------------------ */
 
 .reward-actions {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 9px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -812,14 +900,35 @@ dialog.modal[open]::backdrop {
 .action-badge {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
   padding: 12px 14px;
-  border-radius: 12px;
-  background: #fcfcfb;
-  border: 1px solid var(--fx-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .03);
+  border: 1px solid rgba(255, 255, 255, .09);
 }
-.action-badge strong { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; color: rgba(17, 18, 20, .82); }
-.action-badge small { flex: 1; min-width: 0; font-size: 11px; line-height: 1.4; color: rgba(17, 18, 20, .5); }
+.ab-icon {
+  flex: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, .42);
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .15);
+}
+.ab-icon::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, .16);
+}
+.ab-icon .ab-svg { width: 46px; height: 46px; }
+.action-badge .ab-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.action-badge .ab-text strong { flex: none; font-size: 10.5px; font-weight: 800; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
+.action-badge .ab-text small { flex: 1; min-width: 0; font-size: 11px; line-height: 1.4; color: rgba(255, 255, 255, .48); }
 .ab-mark {
   flex: none;
   padding: 4px 9px;
@@ -828,81 +937,110 @@ dialog.modal[open]::backdrop {
   font-weight: 800;
   letter-spacing: .16em;
   text-indent: .16em;
-  color: rgba(17, 18, 20, .38);
-  background: #efefec;
+  color: rgba(255, 255, 255, .55);
+  background: rgba(255, 255, 255, .08);
 }
-.action-badge.earned { background: var(--fx-surface); border-color: rgba(201, 20, 37, .28); }
-.action-badge.earned strong { color: var(--fx-ink); }
+.action-badge.earned {
+  background: rgba(201, 20, 37, .12);
+  border-color: rgba(201, 20, 37, .42);
+}
+.action-badge.earned .ab-icon {
+  color: #fff;
+  background: var(--fx-red);
+  border-color: rgba(255, 255, 255, .3);
+  box-shadow: 0 10px 26px rgba(201, 20, 37, .4);
+}
+.action-badge.earned .ab-icon::after { border-color: rgba(255, 255, 255, .35); border-style: solid; }
+.action-badge.earned .ab-text strong { color: #fff; }
+.action-badge.earned .ab-text small { color: rgba(255, 255, 255, .62); }
 .action-badge.earned .ab-mark {
   color: #fff;
   background: var(--fx-red);
-  box-shadow: 0 4px 12px rgba(201, 20, 37, .22);
+  box-shadow: 0 4px 12px rgba(201, 20, 37, .3);
 }
+
+/* -- responsive chung của rewards --------------------------------------- */
 
 @media (max-width: 880px) {
   .reward-columns { grid-template-columns: 1fr; }
   .reward-lessons { grid-template-columns: repeat(2, 1fr); }
 }
 @media (max-width: 560px) {
-  .reward-rank { flex-direction: column; align-items: flex-start; gap: 16px; }
-  .rank-share { margin-left: 0; }
+  .reward-rank { flex-direction: column; align-items: flex-start; gap: 18px; padding: 22px 20px 18px; }
   .lesson-tile strong { min-height: 0; }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  #fx-rewards { animation: fx-reward-in .55s var(--fx-ease) both; }
-  @keyframes fx-reward-in {
-    from { opacity: 0; transform: translateY(14px); }
-    to { opacity: 1; transform: none; }
-  }
+/* ====================================================================== */
+/* --- màn XẾP HẠNG (#ranking): thẻ hạng + bục vinh danh + bảng demo --- */
+/* ====================================================================== */
+
+#fx-ranking-root { margin-top: 4px; }
+#fx-leaderboard {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+  gap: 14px;
+  align-items: stretch;
 }
 
-/* --- Rewards v8: badge artwork (SVG) + leaderboard panel --- */
-
-.rank-medal { position: relative; }
-.rank-laurel { position: absolute; inset: -2px; width: calc(100% + 4px); height: calc(100% + 4px); color: rgba(201, 20, 37, .8); }
-.rank-medal .rank-numeral, .rank-medal .rank-tag { position: relative; z-index: 1; }
-
-.lt-coin { display: block; width: 42px; height: 42px; color: rgba(17, 18, 20, .3); }
-.lt-coin .lt-svg { width: 42px; height: 42px; }
-.lesson-tile.completed .lt-coin { color: var(--fx-red); }
-.lesson-tile.locked .lt-coin { color: rgba(17, 18, 20, .16); }
-.lt-num { display: none; } /* replaced by the coin artwork */
-
-.ab-icon {
-  flex: none;
+.lb-mycard {
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: 104px 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 16px 22px;
+  padding: 24px 26px 22px;
+  border-radius: var(--fx-radius);
+  color: #f4f4f2;
+  background:
+    radial-gradient(470px 240px at 92% -10%, rgba(201, 20, 37, .17), transparent 60%),
+    linear-gradient(180deg, #17181b, #0e0f12);
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-left: 3px solid var(--fx-red);
+  box-shadow: var(--fx-shadow-m);
+  align-self: start;
+}
+.lb-mycard > header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.lb-mycard header .kicker { color: rgba(255, 255, 255, .52); }
+.lb-my-main {
+  grid-row: 2;
+  position: relative;
   display: grid;
   place-items: center;
-  width: 48px;
-  height: 48px;
+  align-content: center;
+  gap: 2px;
+  width: 104px;
+  height: 104px;
   border-radius: 50%;
-  color: rgba(17, 18, 20, .32);
-  background: #f2f2ef;
-  border: 1px solid var(--fx-border);
+  border: 1px solid rgba(201, 20, 37, .6);
+  background: radial-gradient(74% 74% at 30% 22%, rgba(201, 20, 37, .38), rgba(201, 20, 37, .05) 72%);
+  box-shadow: 0 16px 40px rgba(201, 20, 37, .22);
 }
-.ab-icon .ab-svg { width: 44px; height: 44px; }
-.action-badge.earned .ab-icon {
-  color: var(--fx-red);
-  background: var(--fx-surface);
-  border-color: rgba(201, 20, 37, .4);
-  box-shadow: 0 6px 16px rgba(201, 20, 37, .16);
-}
-.ab-text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-.action-badge .ab-text strong { flex: none; }
-.action-badge .ab-text small { flex: 1; }
+.lb-laurel { position: absolute; inset: -2px; width: calc(100% + 4px); height: calc(100% + 4px); color: rgba(201, 20, 37, .8); }
+.lb-my-numeral, .lb-my-tag { position: relative; z-index: 1; }
+.lb-my-numeral { font-size: 34px; font-weight: 800; line-height: 1; color: #fff; }
+.lb-my-tag { font-size: 9px; font-weight: 700; letter-spacing: .24em; color: rgba(255, 255, 255, .55); text-indent: .24em; }
 
-#fx-leaderboard {
-  margin-top: 14px;
-  padding: 22px 24px;
-  border-radius: var(--fx-radius);
-  background: var(--fx-surface);
-  border: 1px solid var(--fx-border);
-  box-shadow: var(--fx-shadow-s);
+.lb-my-body { grid-row: 2; min-width: 0; display: flex; flex-direction: column; }
+.lb-my-rank { margin: 0; font-size: 42px; font-weight: 800; line-height: .95; color: #fff; letter-spacing: -.01em; }
+.lb-my-rank em { font-style: normal; font-size: 16px; font-weight: 700; color: rgba(255, 255, 255, .5); }
+.lb-my-tier { margin: 7px 0 0; font-size: 13px; font-weight: 750; color: rgba(255, 255, 255, .78); }
+.lb-my-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+.lb-my-stats span {
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, .82);
+  background: rgba(255, 255, 255, .08);
+  border: 1px solid rgba(255, 255, 255, .14);
+  font-variant-numeric: tabular-nums;
 }
-.lb-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
-.lb-head h3 { margin: 4px 0 0; font-size: 15px; font-weight: 700; letter-spacing: -.005em; color: var(--fx-ink); }
-.lb-head-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.lb-my-stats b { color: #fff; }
+.lb-my-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 16px; }
+.lb-mycard .button.ghost { color: #fff; border-color: rgba(255, 255, 255, .3); }
+.lb-mycard .button.ghost.copied { color: #7cd992; border-color: rgba(124, 217, 146, .45); }
+
 .lb-mode {
+  flex: none;
   padding: 4px 10px;
   border-radius: 999px;
   border: 1px dashed rgba(17, 18, 20, .3);
@@ -911,11 +1049,90 @@ dialog.modal[open]::backdrop {
   letter-spacing: .14em;
   color: rgba(17, 18, 20, .55);
 }
-.lb-rank { font-size: 11.5px; color: rgba(17, 18, 20, .55); }
-.lb-rank b { color: var(--fx-red); font-weight: 800; }
-.lb-sub { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: rgba(17, 18, 20, .55); }
+.lb-mycard .lb-mode { color: rgba(255, 255, 255, .6); border-color: rgba(255, 255, 255, .28); }
 
-.lb-list { list-style: none; margin: 14px 0 0; padding: 0; }
+/* -- bục vinh danh top 3 ------------------------------------------------ */
+
+.lb-podium-wrap {
+  padding: 22px 24px 18px;
+  border-radius: var(--fx-radius);
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  box-shadow: var(--fx-shadow-s);
+}
+.lb-podium-wrap .kicker { color: rgba(17, 18, 20, .45); }
+.lb-podium {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  align-items: end;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.podium {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+  min-width: 0;
+}
+.podium b {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-weight: 750;
+  color: var(--fx-ink);
+}
+.podium small { font-size: 10px; font-weight: 700; letter-spacing: .04em; color: rgba(17, 18, 20, .45); font-variant-numeric: tabular-nums; }
+.podium-coin {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  font-size: 15px;
+  font-weight: 800;
+  color: rgba(17, 18, 20, .7);
+  background: #fff;
+  border: 1.5px solid rgba(17, 18, 20, .5);
+  box-shadow: 0 6px 14px rgba(17, 18, 20, .1);
+}
+.podium.p1 .podium-coin {
+  color: #fff;
+  background: var(--fx-red);
+  border-color: rgba(255, 255, 255, .2);
+  box-shadow: 0 10px 24px rgba(201, 20, 37, .35);
+  transform: scale(1.12);
+}
+.podium.p1 b { color: var(--fx-red); }
+.plinth {
+  width: 100%;
+  height: 40px;
+  border-radius: 9px 9px 0 0;
+  background: linear-gradient(180deg, rgba(17, 18, 20, .04), rgba(17, 18, 20, .09));
+  border: 1px solid var(--fx-border);
+  border-bottom: none;
+}
+.podium.p2 .plinth { height: 58px; border-top: 3px solid rgba(17, 18, 20, .55); }
+.podium.p3 .plinth { height: 42px; border-top: 3px solid rgba(17, 18, 20, .25); }
+.podium.p1 .plinth { height: 78px; border-top: 3px solid var(--fx-red); }
+.podium.empty .plinth { border-style: dashed; border-top: 1px dashed rgba(17, 18, 20, .15); }
+
+/* -- bảng đối chiếu ------------------------------------------------------ */
+
+.lb-table-wrap {
+  grid-column: 1 / -1;
+  padding: 16px 14px 8px;
+  border-radius: var(--fx-radius);
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  box-shadow: var(--fx-shadow-s);
+}
+.lb-list { list-style: none; margin: 0; padding: 0; }
 .lb-row {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr) 150px 64px 48px;
@@ -937,6 +1154,7 @@ dialog.modal[open]::backdrop {
   padding-bottom: 7px;
 }
 .lb-pos { font-size: 12px; font-weight: 800; color: rgba(17, 18, 20, .5); font-variant-numeric: tabular-nums; }
+.lb-row.first .lb-pos { color: var(--fx-red); font-size: 13px; }
 .lb-nick {
   min-width: 0;
   display: flex;
@@ -974,19 +1192,72 @@ dialog.modal[open]::backdrop {
 .lb-row.me { background: var(--fx-surface); box-shadow: inset 3px 0 0 var(--fx-red); }
 .lb-row.me .lb-pos { color: var(--fx-red); }
 
-.lb-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
-.lb-import { display: flex; gap: 10px; margin-top: 12px; }
+.lb-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
+.lb-import { grid-column: 1 / -1; display: flex; gap: 10px; }
 .lb-import .input { flex: 1; min-width: 0; }
-.lb-setup { display: flex; gap: 10px; margin-top: 16px; max-width: 480px; }
-.lb-note { margin-top: 14px; font-size: 11px; line-height: 1.6; color: rgba(17, 18, 20, .45); }
+.lb-note { grid-column: 1 / -1; margin: 2px 2px 0; font-size: 11px; line-height: 1.6; color: rgba(17, 18, 20, .45); }
 
+/* -- ghi danh (chưa có nickname) ----------------------------------------- */
+
+.lb-setup-wrap {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px 26px;
+  border-radius: var(--fx-radius);
+  background: var(--fx-surface);
+  border: 1px solid var(--fx-border);
+  border-left: 3px solid var(--fx-red);
+  box-shadow: var(--fx-shadow-s);
+}
+.lb-setup-wrap h3 { margin: 4px 0 0; font-size: 18px; font-weight: 750; letter-spacing: -.005em; color: var(--fx-ink); }
+.lb-sub { margin-top: 6px; font-size: 12.5px; line-height: 1.5; color: rgba(17, 18, 20, .55); }
+.lb-setup { display: flex; gap: 10px; margin-top: 16px; max-width: 520px; width: 100%; }
+.lb-setup .input { flex: 1; min-width: 0; }
+.lb-setup-wrap .lb-mode { margin-top: 12px; }
+
+/* -- responsive xếp hạng -------------------------------------------------- */
+
+@media (max-width: 960px) {
+  #fx-leaderboard { grid-template-columns: 1fr; }
+}
 @media (max-width: 700px) {
-  .lb-row { grid-template-columns: 24px minmax(0, 1fr) 110px 48px; }
+  .lb-row { grid-template-columns: 24px minmax(0, 1fr) 108px 48px; }
   .lb-best, .lb-cols span:nth-child(5) { display: none; }
-  .lb-head { flex-direction: column; }
-  .lb-head-meta { flex-direction: row; align-items: center; justify-content: space-between; width: 100%; }
+  .lb-podium { gap: 8px; }
+  .podium-coin { width: 40px; height: 40px; font-size: 13px; }
+  .podium.p1 .plinth { height: 62px; }
+  .podium.p2 .plinth { height: 46px; }
+  .podium.p3 .plinth { height: 34px; }
+}
+@media (max-width: 560px) {
+  .lb-mycard .lb-my-main { width: 96px; height: 96px; }
+  .lb-import { flex-direction: column; }
 }
 
+/* -- motion (chỉ khi người dùng không tắt) -------------------------------- */
+
 @media (prefers-reduced-motion: no-preference) {
-  #fx-leaderboard { animation: fx-reward-in .55s var(--fx-ease) both; animation-delay: .06s; }
+  #fx-rewards, #fx-leaderboard { animation: fx-reward-in .55s var(--fx-ease) both; }
+  @keyframes fx-reward-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+  }
+  .action-badge.earned .ab-icon {
+    animation: fx-stamp .55s var(--fx-ease) both;
+    animation-delay: .12s;
+  }
+  .reward-block.dark .action-badge.earned:nth-of-type(2) .ab-icon { animation-delay: .18s; }
+  .reward-block.dark .action-badge.earned:nth-of-type(3) .ab-icon { animation-delay: .24s; }
+  .reward-block.dark .action-badge.earned:nth-of-type(4) .ab-icon { animation-delay: .3s; }
+  .reward-block.dark .action-badge.earned:nth-of-type(5) .ab-icon { animation-delay: .36s; }
+  @keyframes fx-stamp {
+    0% { transform: scale(1.55) rotate(6deg); opacity: 0; }
+    62% { transform: scale(.94) rotate(-4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); }
+  }
+  .lesson-tile:hover { transform: translateY(-2px); }
+  .lesson-tile { transition: transform .22s var(--fx-ease), box-shadow .22s var(--fx-ease); }
+  .lesson-tile:hover { box-shadow: 0 10px 22px rgba(17, 18, 20, .08); }
 }

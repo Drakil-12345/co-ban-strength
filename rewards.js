@@ -62,10 +62,8 @@
     TIERS.forEach(function (tier, i) { if (count >= tier.min) index = i; });
     var current = TIERS[index];
     var next = TIERS[index + 1] || null;
-    var ratio = 1;
-    if (next) {
-      ratio = Math.min(1, Math.max(0, (count - current.min) / (next.min - current.min)));
-    }
+    /* tỉ lệ toàn cục trên thang 8 bài → các mốc 2/4/6/8 nằm đúng 25/50/75/100% */
+    var ratio = Math.min(1, Math.max(0, count / 8));
     return { current: current, next: next, ratio: ratio };
   }
 
@@ -107,7 +105,7 @@
   }
 
   function lessonCoin(index, status) {
-    var svg = '<svg class="lt-svg" viewBox="0 0 48 48" width="42" height="42" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">' +
+    var svg = '<svg class="lt-svg" viewBox="0 0 48 48" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">' +
       (status === "locked"
         ? '<circle cx="24" cy="24" r="19" stroke-dasharray="3.5 4"/>'
         : '<circle cx="24" cy="24" r="19"/>') +
@@ -115,7 +113,9 @@
       svgText(24, 30.5, 16, index < 10 ? "0" + index : String(index)) +
       (status === "completed"
         ? '<g class="lt-check"><circle cx="36.5" cy="36.5" r="7" fill="#4d9e61" stroke="none"/><path d="M33.2 36.6l2.4 2.4 4-4.6" stroke="#fff" stroke-width="1.8"/></g>'
-        : "") +
+        : status === "available"
+          ? '<g class="lt-now" fill="currentColor" stroke="none"><circle cx="37.5" cy="11.5" r="3.4"/></g>'
+          : "") +
       '</svg>';
     return '<span class="lt-coin" aria-hidden="true">' + svg + '</span>';
   }
@@ -131,7 +131,18 @@
       '</svg>';
   }
 
+  function ribbon() {
+    /* hai dải ruy băng buộc huy chương, tít dưới vòng tròn */
+    return '<svg class="rank-ribbon" viewBox="0 0 44 26" width="44" height="26" fill="currentColor" stroke="none" aria-hidden="true">' +
+      '<path d="M10 0h10L17 24l-5-6-5 5z" opacity=".92"/>' +
+      '<path d="M34 0H24l3 24 5-6 5 5z" opacity=".68"/>' +
+      '<path d="M12 3.5h6l1 4h-6z" fill="rgba(0,0,0,.28)"/>' +
+      '</svg>';
+  }
+
   /* ---------- sections ---------- */
+
+  var MILESTONES = [2, 4, 6, 8];
 
   function rankCard(state, count) {
     var info = tierInfo(count);
@@ -139,17 +150,21 @@
     if (count === 0) sub = "Chưa ghi nhận bài học nào — bài 1 đang mở.";
     else if (info.next) sub = count + "/8 bài học · còn " + (info.next.min - count) + " bài để lên Bậc " + info.next.numeral + " " + esc(info.next.name) + ".";
     else sub = "8/8 bài học · bạn đã mở đủ bốn bậc.";
+    var ticks = MILESTONES.map(function (m) {
+      return '<i style="left:' + (m / 8 * 100) + '%"' + (count >= m ? ' class="past"' : "") + ">" + m + "</i>";
+    }).join("");
     return '<article class="reward-rank" data-tier="' + info.current.numeral + '">' +
-      '<div class="rank-medal" aria-hidden="true">' + laurel() +
+      '<div class="rank-medal" aria-hidden="true">' + laurel() + ribbon() +
       '<span class="rank-numeral">' + info.current.numeral + '</span><small class="rank-tag">BẬC</small></div>' +
       '<div class="rank-body">' +
       '<p class="kicker">XẾP HẠNG TIẾN BỘ</p>' +
       '<h3>Bậc ' + info.current.numeral + ' · ' + esc(info.current.name) + '</h3>' +
       '<p class="rank-sub">' + sub + '</p>' +
-      '<div class="rank-track" aria-hidden="true"><span style="width:' + Math.round(info.ratio * 100) + '%"></span></div>' +
+      '<div class="rank-track-wrap" aria-hidden="true"><div class="rank-track"><span style="width:' + Math.round(info.ratio * 100) + '%"></span></div><div class="rank-ticks">' + ticks + '</div></div>' +
       '<div class="rank-meta">' +
       '<span class="rank-chip">Điểm cao nhất · ' + bestScore(state) + '/100</span>' +
       '<button class="button ghost rank-share" type="button">Chia sẻ hạng</button>' +
+      '<button class="button ghost rank-ranking-link" type="button" data-route="ranking">Bảng xếp hạng <span aria-hidden="true">→</span></button>' +
       '</div></div></article>';
   }
 
@@ -206,11 +221,12 @@
 
   function sectionHTML(state) {
     var count = completedCount(state);
+    var badgesEarned = ACTIONS.filter(function (action) { return earnedAction(state, action.key); }).length;
     return rankCard(state, count) +
       '<div class="reward-columns">' +
-      '<section class="reward-block"><header><p class="kicker">THÀNH TỰU BÀI HỌC</p><h3>Tám bài, nhịp từng bài một.</h3></header>' +
+      '<section class="reward-block"><header><div><p class="kicker">THÀNH TỰU BÀI HỌC</p><h3>Tám bài, nhịp từng bài một.</h3></div><span class="rb-count">' + count + '/8</span></header>' +
       '<ol class="reward-lessons">' + lessonTiles(state) + '</ol></section>' +
-      '<section class="reward-block"><header><p class="kicker">HUY HIỆU HÀNH ĐỘNG</p><h3>Năm việc thật, không huy hiệu ảo.</h3></header>' +
+      '<section class="reward-block dark"><header><div><p class="kicker">HUY HIỆU HÀNH ĐỘNG</p><h3>Năm việc thật, không huy hiệu ảo.</h3></div><span class="rb-count">' + badgesEarned + '/5</span></header>' +
       '<ul class="reward-actions">' + actionTiles(state) + '</ul></section>' +
       '</div>';
   }

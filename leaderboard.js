@@ -1,8 +1,9 @@
 /* leaderboard.js — bảng xếp hạng tiến độ, layer chỉ ĐỌC đối với state app.
    Đọc localStorage "co-ban-strength-v1" (tiêu chí xếp hạng) + key riêng của nó
    ("co-ban-strength-leader-v1" hồ sơ bạn, "co-ban-strength-friends-v1" bạn bè
-   nhập bằng mã) và render <section id="fx-leaderboard"> ngay sau #fx-rewards
-   trên màn Tiến độ. Không bao giờ ghi state app, không đụng app.js/logic.js.
+   nhập bằng mã) và đổ UI vào <div id="fx-ranking-root"> trên màn "Xếp hạng"
+   (route #ranking — khung do app.js render, app.js không biết chi tiết bảng).
+   Không bao giờ ghi state app.
    TRANSPORT hiện tại là "demo" (dữ liệu mô phỏng, có đánh dấu). Khi có backend
    thật (kvdb.io bucket đã verify email, hoặc Firebase Realtime Database), chỉ
    cần thay Transport.fetch / Transport.publish bên dưới — giao diện giữ nguyên:
@@ -16,6 +17,7 @@
   var STORE = "co-ban-strength-leader-v1";
   var FRIENDS = "co-ban-strength-friends-v1";
   var SECTION_ID = "fx-leaderboard";
+  var ROOT_ID = "fx-ranking-root";
 
   /* ---------- helpers ---------- */
 
@@ -70,8 +72,6 @@
   }
 
   /* ---------- transport (pluggable) ---------- */
-
-  var TRANSPORT_ID = "demo";
 
   var DEMO_PEERS = [
     { uid: "d01", nick: "Minh Anh", lessons: 8, best: 96 },
@@ -142,13 +142,24 @@
     };
   }
 
+  /* ---------- artwork (mini laurel cho huy chương cá nhân) ---------- */
+
+  function myLaurel() {
+    return '<svg class="lb-laurel" viewBox="0 0 48 48" width="72" height="72" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" aria-hidden="true">' +
+      '<circle cx="24" cy="24" r="22" opacity=".5"/>' +
+      '<path d="M14 8C9 15 7.5 24 10 33c1.6 3.2 3.9 5.6 6.8 7" opacity=".85"/>' +
+      '<path d="M34 8c5 7 6.5 16 4 25-1.6 3.2-3.9 5.6-6.8 7" opacity=".85"/>' +
+      '<path d="M9.5 28l-3-1.4M11 22l-3.2-.9M13.5 17l-3-1.7M17 12.8l-2.4-2.3M38.5 28l3-1.4M37 22l3.2-.9M34.5 17l3-1.7M31 12.8l2.4-2.3" opacity=".75"/>' +
+      '</svg>';
+  }
+
   /* ---------- render ---------- */
 
   function rows(entries) {
     return entries.map(function (entry, index) {
       var tier = TIERS[entry.tier] || TIERS[0];
       var tag = entry.me ? '<span class="lb-you-tag">BẠN</span>' : entry.friend ? '<span class="lb-friend-tag">BẠN BÈ</span>' : "";
-      return '<li class="lb-row' + (entry.me ? " me" : "") + '">' +
+      return '<li class="lb-row' + (entry.me ? " me" : "") + (index === 0 ? " first" : "") + '">' +
         '<span class="lb-pos">' + (index + 1) + '</span>' +
         '<span class="lb-nick" title="' + esc(entry.nick) + '">' + esc(entry.nick || "Vô danh") + tag + '</span>' +
         '<span class="lb-tier">B' + entry.tier + ' · ' + esc(tier.name) + '</span>' +
@@ -158,64 +169,104 @@
     }).join("");
   }
 
-  function table(entries, me) {
+  function rankOf(entries) {
     var myIndex = -1;
     entries.forEach(function (entry, index) { if (entry.me) myIndex = index; });
-    var rank = myIndex >= 0 ? "#" + (myIndex + 1) + "/" + entries.length : "chưa có mặt";
-    return '<header class="lb-head"><div><p class="kicker">ĐUA SỨC BỀN, KHÔNG ĐUA TẢN NHÊ</p>' +
-      '<h3>Bảng xếp hạng demo</h3></div>' +
-      '<div class="lb-head-meta"><span class="lb-mode">' + Transport.label + '</span>' +
-      '<span class="lb-rank">Hạng của bạn <b>' + esc(rank) + '</b></span></div></header>' +
-      '<ul class="lb-list" role="list">' +
+    return myIndex >= 0 ? "#" + (myIndex + 1) + "/" + entries.length : null;
+  }
+
+  function myCard(me, entries) {
+    var tier = TIERS[me.tier] || TIERS[0];
+    var rank = rankOf(entries);
+    return '<article class="lb-mycard">' +
+      '<header><p class="kicker">HẠNG CỦA BẠN</p><span class="lb-mode">' + Transport.label + '</span></header>' +
+      '<div class="lb-my-main" aria-hidden="true">' + myLaurel() +
+      '<span class="lb-my-numeral">' + me.tier + '</span><small class="lb-my-tag">BẬC</small></div>' +
+      '<div class="lb-my-body">' +
+      '<p class="lb-my-rank">' + (rank ? '<b>' + rank.split("/")[0] + '</b><em>/' + rank.split("/")[1] + '</em>' : "chưa có mặt") + '</p>' +
+      '<p class="lb-my-tier">B' + me.tier + ' · ' + esc(tier.name) + '</p>' +
+      '<div class="lb-my-stats">' +
+      '<span><b>' + me.lessons + '/8</b> bài học</span>' +
+      '<span><b>' + me.best + '</b> điểm cao nhất</span>' +
+      '</div>' +
+      '<div class="lb-my-actions">' +
+      '<button class="button primary lb-copy" type="button">Chia sẻ mã</button>' +
+      '<button class="button ghost lb-add" type="button">Nhập mã bạn bè</button>' +
+      '</div></div></article>';
+  }
+
+  function podium(entries) {
+    if (!entries.length) return "";
+    var top3 = entries.slice(0, 3);
+    /* xếp bục: nhì, nhất, ba (visual order) */
+    var slots = [{ idx: 1, cls: "p2" }, { idx: 0, cls: "p1" }, { idx: 2, cls: "p3" }];
+    return '<section class="lb-podium-wrap" aria-label="Bục vinh danh top 3"><p class="kicker">BỤC VINH DANH · TOP 3</p>' +
+      '<ol class="lb-podium" role="list">' +
+      slots.map(function (slot) {
+        var entry = top3[slot.idx];
+        if (!entry) return '<li class="podium ' + slot.cls + ' empty"><i class="plinth" aria-hidden="true"></i></li>';
+        var tier = TIERS[entry.tier] || TIERS[0];
+        return '<li class="podium ' + slot.cls + '">' +
+          '<span class="podium-coin" aria-hidden="true">' + (slot.idx + 1) + '</span>' +
+          '<b>' + esc(entry.nick || "Vô danh") + '</b>' +
+          '<small>B' + entry.tier + ' · ' + entry.lessons + '/8 · ' + entry.best + '</small>' +
+          '<i class="plinth" aria-hidden="true"></i></li>';
+      }).join("") +
+      '</ol></section>';
+  }
+
+  function table(entries) {
+    return '<div class="lb-table-wrap"><ul class="lb-list" role="list">' +
       '<li class="lb-row lb-cols" aria-hidden="true"><span>#</span><span>Nickname</span><span>Bậc</span><span>Bài</span><span>Điểm</span></li>' +
       rows(entries) +
-      '</ul>' +
-      '<div class="lb-actions">' +
+      '</ul></div>';
+  }
+
+  function actionsBlock() {
+    return '<div class="lb-actions">' +
       '<button class="button ghost lb-refresh" type="button">Làm mới</button>' +
-      '<button class="button ghost lb-copy" type="button">Chia sẻ mã của bạn</button>' +
       '<button class="button ghost lb-add" type="button">Nhập mã bạn bè</button>' +
       '</div>' +
       '<form class="lb-import" id="lb-import-form" hidden>' +
       '<input class="input" id="lb-friend-codes" maxlength="400" placeholder="Dán mã trên mỗi dòng · CB|Tên|bậc|bài|điểm">' +
       '<button class="button primary" type="submit">Ghép vào bảng</button>' +
       '</form>' +
-      '<p class="lb-note">Demo so sánh theo bài học xong và điểm cao nhất. Khi cắm backend online (kvdb / Firebase), bảng giữa những người thật sẽ thay vào chỗ này — giao diện giữ nguyên.</p>';
+      '<p class="lb-note">Demo so sánh theo bài học xong rồi điểm cao nhất. Khi cắm backend online (kvdb / Firebase), bảng giữa những người thật sẽ thay vào đúng giao diện này.</p>';
   }
 
-  function setupForm() {
-    return '<header class="lb-head"><div><p class="kicker">ĐUA SỨC BỀN, KHÔNG ĐUA TẢN NHÊ</p>' +
-      '<h3>Bảng xếp hạng demo</h3><p class="lb-sub">Chọn một nickname để hiện mặt trong bảng. Không mật khẩu, không email.</p></div>' +
-      '<span class="lb-mode">' + Transport.label + '</span></header>' +
+  function setupBlock() {
+    return '<section class="lb-setup-wrap">' +
+      '<header><p class="kicker">GHI DANH</p><h3>Chọn một nickname để hiện mặt trên bảng.</h3><p class="lb-sub">Không mật khẩu, không email — lưu riêng trên thiết bị này, không đụng dữ liệu app.</p></header>' +
       '<form class="lb-setup" id="lb-setup-form">' +
       '<input class="input" id="lb-nick" maxlength="20" placeholder="Nickname của bạn" autocomplete="off">' +
       '<button class="button primary" type="submit">Vào bảng hạng</button>' +
-      '</form>';
+      '</form><span class="lb-mode">' + Transport.label + '</span></section>' +
+      '<p class="lb-note">Dưới đây là những người cùng tiến (dữ liệu demo). Ghép mã bạn bè để đưa họ vào bảng so cùng bạn.</p>';
   }
 
   function section(me, entries, ok) {
     var body;
     if (!ok) {
-      body = '<header class="lb-head"><div><p class="kicker">ĐUA SỨC BỀN, KHÔNG ĐUA TẢN NHÊ</p>' +
-        '<h3>Bảng xếp hạng demo</h3><p class="lb-sub">Không tải được dữ liệu bảng lúc này.</p></div>' +
-        '<span class="lb-mode">'+ Transport.label + '</span></header>' +
-        '<div class="lb-actions"><button class="button ghost lb-refresh" type="button">Thử lại</button></div>';
+      body = '<section class="lb-setup-wrap"><header><p class="kicker">ĐUA SỨC BỀN, KHÔNG ĐUA TẢN NHÊ</p><h3>Không tải được dữ liệu bảng lúc này.</h3></header>' +
+        '<div class="lb-actions"><button class="button ghost lb-refresh" type="button">Thử lại</button></div>' +
+        '<span class="lb-mode">' + Transport.label + '</span></section>';
     } else if (me && me.nick) {
-      body = table(entries, me);
+      body = myCard(me, entries) +
+        podium(entries) +
+        table(entries) +
+        actionsBlock();
     } else {
-      body = setupForm();
+      body = setupBlock() +
+        podium(entries) +
+        table(entries) +
+        '<div class="lb-actions"><button class="button ghost lb-refresh" type="button">Làm mới</button></div>';
     }
-    return '<section id="' + SECTION_ID + '" aria-label="Bảng xếp hạng demo">' + body + '</section>';
+    return '<section id="' + SECTION_ID + '" aria-label="Bảng xếp hạng cùng tiến">' + body + '</section>';
   }
 
   /* ---------- wiring ---------- */
 
   var cachedEntries = null;
-
-  function serialize(entries) {
-    var me = entries.filter(function (entry) { return entry.me; })[0];
-    var others = entries.filter(function (entry) { return !entry.me; });
-    return { me: me, entries: entries, others: others };
-  }
 
   function computeEntries() {
     var me = myEntry();
@@ -248,20 +299,15 @@
 
   function mount(force) {
     if (!L) return;
-    var anchor = document.getElementById("fx-rewards");
-    if (!anchor) return; /* chỉ gắn trên route achievements */
-    if (!force) {
-      var following = anchor.nextElementSibling;
-      if (following && following.id === SECTION_ID) return;
-    }
-    var stale = document.getElementById(SECTION_ID);
-    if (stale) stale.remove();
+    var stage = document.getElementById(ROOT_ID);
+    if (!stage) return; /* chỉ gắn trên route #ranking */
+    if (!force && stage.childElementCount) return; /* đã đổ nội dung — không render lại (chống MO churn) */
+    if (force) stage.innerHTML = "";
 
     computeEntries().then(function (result) {
-      var el = document.createElement("section");
-      el.id = SECTION_ID;
-      el.innerHTML = section(result.me, result.entries, result.ok);
-      anchor.after(el);
+      var fresh = document.getElementById(ROOT_ID); /* re-check async xong */
+      if (!fresh) return;
+      fresh.innerHTML = section(result.me, result.entries, result.ok);
       cachedEntries = result;
     });
   }
@@ -305,7 +351,7 @@
       writeJSON(STORE, { uid: "me", nick: nick, savedAt: new Date().toISOString() });
       var me = myEntry();
       Transport.publish({ uid: "me", nick: nick, lessons: me ? me.lessons : 0, best: me ? me.best : 0, tier: me ? me.tier : 0, updatedAt: Date.now() });
-      mount(true); /* force re-render: section đã tồn tại phải thay bằng bảng */
+      mount(true); /* force re-render: hiện thẻ hạng + my-entry trong bảng */
       return;
     }
     if (form.id === "lb-import-form") {
@@ -330,8 +376,8 @@
   document.addEventListener("click", function (event) {
     var button = event.target.closest("button");
     if (!button) return;
-    var section = button.closest("#" + SECTION_ID);
-    if (!section) return;
+    var scope = button.closest("#" + SECTION_ID);
+    if (!scope) return;
     if (button.classList.contains("lb-refresh")) {
       cachedEntries = null;
       mount(true);
@@ -351,10 +397,13 @@
       return;
     }
     if (button.classList.contains("lb-add")) {
-      var form = section.querySelector("#lb-import-form");
+      cachedEntries = null;
+      var form = scope.querySelector("#lb-import-form");
       if (form) {
         form.hidden = !form.hidden;
         if (!form.hidden) form.querySelector("#lb-friend-codes").focus();
+      } else {
+        mount(true); /* chưa có form (chưa đăng ký nick) → thử lại với bảng mới */
       }
     }
   });
@@ -374,7 +423,7 @@
     mount();
   }
 
-  /* API cho test và cho giao năng tương lai (vẫn chỉ đọc). */
+  /* API cho test và cho giao tiếp tương lai (vẫn chỉ đọc). */
   window.CoBanLeaderboard = {
     transport: Transport,
     shareCode: shareCode,
